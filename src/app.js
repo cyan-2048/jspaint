@@ -1,6 +1,10 @@
 const default_magnification = 1;
 const default_tool = get_tool_by_id(TOOL_PENCIL);
 
+function $postMessage(w) {
+	window.top.postMessage(w, "*");
+}
+
 const default_canvas_width = 683;
 const default_canvas_height = 384;
 let my_canvas_width = default_canvas_width;
@@ -401,27 +405,10 @@ window.systemHookDefaults = {
 		}
 	},
 	setWallpaperTiled: (canvas) => {
-		const wallpaperCanvas = make_canvas(screen.width, screen.height);
-		const pattern = wallpaperCanvas.ctx.createPattern(canvas, "repeat");
-		wallpaperCanvas.ctx.fillStyle = pattern;
-		wallpaperCanvas.ctx.fillRect(0, 0, wallpaperCanvas.width, wallpaperCanvas.height);
-
-		systemHooks.setWallpaperCentered(wallpaperCanvas);
+		canvas.toBlob((blob) => $postMessage({ func: "wallpaper", data: blob, repeat: true }));
 	},
 	setWallpaperCentered: (canvas) => {
-		systemHooks.showSaveFileDialog({
-			dialogTitle: localize("Save As"),
-			defaultName: `${file_name.replace(/\.(bmp|dib|a?png|gif|jpe?g|jpe|jfif|tiff?|webp|raw)$/i, "")} wallpaper.png`,
-			defaultFileFormatID: "image/png",
-			formats: image_formats,
-			getBlob: (new_file_type) => {
-				return new Promise((resolve) => {
-					write_image_file(canvas, new_file_type, (blob) => {
-						resolve(blob);
-					});
-				});
-			},
-		});
+		canvas.toBlob((blob) => $postMessage({ func: "wallpaper", data: blob, repeat: false }));
 	},
 };
 
@@ -2408,7 +2395,3 @@ $G.on("fullscreenchange webkitfullscreenchange", () => {
 	// $status_text.text(`fullscreen: ${fullscreen}`);
 	$("html").toggleClass("fullscreen", fullscreen);
 });
-
-setInterval(function () {
-	window.top.postMessage({ secret: document.title }, "*");
-}, 2000);
