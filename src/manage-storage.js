@@ -1,5 +1,4 @@
 ((exports) => {
-
 	let $storage_manager;
 	let $quota_exceeded_window;
 	let ignoring_quota_exceeded = false;
@@ -42,9 +41,7 @@
 		$storage_manager = $DialogWindow().title("Manage Storage").addClass("storage-manager squish");
 		// @TODO: way to remove all (with confirmation)
 		const $table = $(E("table")).appendTo($storage_manager.$main);
-		const $message = $(E("p")).appendTo($storage_manager.$main).html(
-			"Any images you've saved to your computer with <b>File > Save</b> will not be affected."
-		);
+		const $message = $(E("p")).appendTo($storage_manager.$main).html("Any images you've saved to your computer with <b>File > Save</b> will not be affected.");
 		$storage_manager.$Button("Close", () => {
 			$storage_manager.close();
 		});
@@ -55,13 +52,17 @@
 			const $img = $(E("img")).attr({ src: imgSrc }).addClass("thumbnail-img");
 			const $remove = $(E("button")).text("Remove").addClass("remove-button");
 			const href = `#${k.replace("image#", "local:")}`;
-			const $open_link = $(E("a")).attr({ href, target: "_blank" }).text(localize("Open"));
-			const $thumbnail_open_link = $(E("a")).attr({ href, target: "_blank" }).addClass("thumbnail-container");
+			const $open_link = $(E("a")).text(localize("Open"));
+			const $thumbnail_open_link = $(E("a")).addClass("thumbnail-container");
 			$thumbnail_open_link.append($img);
 			$(E("td")).append($thumbnail_open_link).appendTo($tr);
 			$(E("td")).append($open_link).appendTo($tr);
 			$(E("td")).append($remove).appendTo($tr);
-
+			function clickPost() {
+				$postMessage({ func: "open", data: href });
+			}
+			$open_link.on("click", clickPost);
+			$thumbnail_open_link.on("click", clickPost);
 			$remove.on("click", () => {
 				localStorage.removeItem(k);
 				$tr.remove();
@@ -84,7 +85,7 @@
 				delete localStorage._available;
 			}
 			// eslint-disable-next-line no-empty
-		} catch (e) { }
+		} catch (e) {}
 
 		if (localStorageAvailable) {
 			for (const k in localStorage) {
@@ -95,7 +96,7 @@
 							v = JSON.parse(v);
 						}
 						// eslint-disable-next-line no-empty
-					} catch (e) { }
+					} catch (e) {}
 					addRow(k, v);
 				}
 			}
@@ -117,5 +118,4 @@
 
 	exports.storage_quota_exceeded = storage_quota_exceeded;
 	exports.manage_storage = manage_storage;
-
 })(window);
