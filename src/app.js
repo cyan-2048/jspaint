@@ -5,6 +5,14 @@ function $postMessage(w) {
 	window.top.postMessage(w, "*");
 }
 
+window.onmessage = function (e) {
+	const data = e.data;
+	if (typeof data !== "object") return;
+	if (data.open) {
+		change_url_param("load", data.data);
+	}
+};
+
 const default_canvas_width = 683;
 const default_canvas_height = 384;
 let my_canvas_width = default_canvas_width;

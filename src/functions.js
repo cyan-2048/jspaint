@@ -682,8 +682,6 @@ async function load_image_from_uri(uri) {
 		is_download && !is_localhost
 			? [
 					uri,
-					// work around CORS headers not sent by whatever server
-					`https://cors.bridged.cc/${uri}`,
 					`https://jspaint-cors-proxy.herokuapp.com/${uri}`,
 					// if the image isn't available on the live web, see if it's archived
 					`https://web.archive.org/${uri}`,
